@@ -16,12 +16,61 @@ void ingresar();
 void abrir();
 void modificar();
 void buscar_id();
+void buscar_codigo();
+void eliminar_codigo();
 
 main(){
-	/*ingresar();*/
 	abrir();
-	/*modificar();*/
-	buscar_id();
+	
+	int opcion;
+	
+	do{
+		cout<<"Ingrese la opcion que desea realizar: "<<endl;
+		cout<<"1 - Ingresar"<<endl;
+		cout<<"2 - Buscar"<<endl;
+		cout<<"3 - Modificar"<<endl;
+		cout<<"4 - Eliminar"<<endl;
+		cout<<"5 - Salir"<<endl;
+		cout<<"Ingrese una opcion: ";
+		cin>>opcion;
+		
+		system("cls");
+		switch(opcion){
+			case 1:{
+				ingresar();
+				break;
+			}
+			case 2:{
+				int b=0;
+				cout<<"De que forma desea buscar"<<endl;
+				cout<<"1. Por id"<<endl;
+				cout<<"2. Por codigo"<<endl;
+				cout<<"Ingrese la forma de busqueda: ";
+				cin>>b;
+				
+				if(b==1){
+					buscar_id();
+				}else{
+					buscar_codigo();
+				}
+	
+				break;
+			}
+			case 3:{
+				modificar();
+				break;
+			}
+			case 4:{
+				eliminar_codigo();
+				break;
+			}
+			case 5:{
+				return 0;
+				break;
+			}
+		}
+	}while(opcion != 5);
+	
 }
 
 void abrir(){
@@ -57,16 +106,16 @@ void ingresar(){
 
 	do{
 		fflush(stdin);
-		cout<<"Ingrese el Codigo:";
+		cout<<"Ingrese el Codigo: ";
 		cin>>estudiante.codigo;
 		cin.ignore();
-		cout<<"Ingrese los Nombres:";
+		cout<<"Ingrese los Nombres: ";
 		getline(cin,nombre);
 		strcpy(estudiante.nombres,nombre.c_str());
-		cout<<"Ingrese los Apellidos:";
+		cout<<"Ingrese los Apellidos: ";
 		getline(cin,apellido);
 		strcpy(estudiante.apellidos,apellido.c_str());
-		cout<<"Ingrese el Telefono:";
+		cout<<"Ingrese el Telefono: ";
 		cin>>estudiante.telefono;
 
 		fwrite(&estudiante,sizeof(Estudiante),1,archivo);
@@ -148,12 +197,40 @@ void buscar_codigo(){
 
 	} while(feof(archivo)==0);
 
-	
+	fclose(archivo);
+}
 
-	
+void eliminar_codigo(){
+	FILE* archivo = fopen(nombre_archivo,"r+b");	
+	int pos=0,indice=0,cod=0;
 
+	cout<<"Que codigo desea eliminar: ";
+	cin>>cod;
+
+	Estudiante estudiante;
+	fread(&estudiante,sizeof(Estudiante),1,archivo);
 	
+	FILE* temporal = fopen("temp.dat","w+b");	
+
+	do{
+		if(estudiante.codigo == cod){
+		  	cout<<"Codigo: "<<estudiante.codigo<<endl;
+		  	cout<<"Nombres: "<<estudiante.nombres<<endl;
+		  	cout<<"Apellidos: "<<estudiante.apellidos<<endl;
+		  	cout<<"Telefono: "<<estudiante.telefono<<endl;
+  	
+	  }else{
+	  	fwrite(&estudiante,sizeof(Estudiante),1,temporal);
+	  }
+	  
+	  fread(&estudiante,sizeof(Estudiante),1,archivo);	
+
+	} while(feof(archivo)==0);
 
 	fclose(archivo);
-
+	fclose(temporal);
+	
+	remove("archivo.dat");
+	rename("temp.dat", "archivo.dat");
+	abrir();
 }
